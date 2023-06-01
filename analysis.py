@@ -49,7 +49,6 @@ def get_harmonic_energy(n, bhw, dim, is_bosonic=True):
     return -dz_arr[n] / z_arr[n]
 
 
-
 def read_ipi_output(filename):
     """ Reads an i-PI output file and returns a dictionary with the properties in a tidy order. """
 
@@ -57,7 +56,7 @@ def read_ipi_output(filename):
 
     regex = re.compile(".*column *([0-9]*) *--> ([^ {]*)")
 
-    fields = [];
+    fields = []
     cols = []
     for line in f:
         if line[0] == "#":

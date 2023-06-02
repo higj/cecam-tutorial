@@ -1,11 +1,5 @@
 import re
-import sys
-
 import numpy as np
-import statistics
-import argparse
-import pathlib
-import itertools
 
 
 # Functions for evaluating the mean energy for the harmonic potential, analytically
@@ -117,22 +111,3 @@ def analytical_energy(temp=17.4, sys_type='dist'):
 
     # Unless specified otherwise, assume distinguishable particles.
     return get_harmonic_energy(3, bhw, dim, False) * hbar * omega
-
-"""
-def main():
-    parser = argparse.ArgumentParser(description='Analyze i-Pi simulation results')
-
-    parser.add_argument('infile', type=str, nargs='*', help='Path to i-Pi data.out output file')
-    parser.add_argument('-t', type=float, nargs=1, help='Temperature (in kelvin)')
-
-    # Think about how to deal with case of mixed particles and/or fermions
-    parser.add_argument('-n', type=int, nargs=1, help='Number of particles')
-
-    args = parser.parse_args()
-
-    # analyze_mean_energy(args.infile[0])
-    get_average_energy(args.infile, args.n[0], args.t[0])
-
-if __name__ == "__main__":
-    main()
-"""

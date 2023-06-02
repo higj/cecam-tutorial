@@ -73,9 +73,9 @@ def read_ipi_output(filename):
 
 def get_mean_energies(filename, skip_steps=100):
     o = read_ipi_output(filename + "data.out")
-    avg_kinetic = -statistics.mean(o['virial_fq'][skip_steps:])
-    avg_kinetic_cv = statistics.mean(o['kinetic_cv'][skip_steps:])
-    avg_potential = statistics.mean(o['potential'][skip_steps:])
+    avg_kinetic = -o['virial_fq'][skip_steps:]
+    avg_kinetic_cv = o['kinetic_cv'][skip_steps:]
+    avg_potential = o['potential'][skip_steps:]
     return {
         'virial': avg_kinetic,
         'centroid_virial': avg_kinetic_cv,
@@ -83,7 +83,7 @@ def get_mean_energies(filename, skip_steps=100):
     }
 
 
-def analytical_energy(nparticles=3, temp=17.8, sys_type='dist'):
+def analytical_energy(temp=17.4, sys_type='dist'):
     dim = 3  # Dimension of the physical system
     spring_constant = 1.21647924E-8  # Spring constant
     mass = 1.0  # Mass of the particle
@@ -99,26 +99,24 @@ def analytical_energy(nparticles=3, temp=17.8, sys_type='dist'):
     bhw = hbar * beta * omega
 
     if sys_type == 'bosonic':
-        return get_harmonic_energy(nparticles, bhw, dim, True) * hbar * omega
+        return get_harmonic_energy(3, bhw, dim, True) * hbar * omega
     elif sys_type == 'mixed':
         return (get_harmonic_energy(2, bhw, dim, True) + get_harmonic_energy(1, bhw, dim, False)) * hbar * omega
     elif sys_type == 'fermionic':
-        # Analytical result for three fermions in a 3D harmonic trap (NVT)
+        # Analytical result for three fermions in a 2D harmonic trap (NVT)
         exp = np.exp(bhw)
         exp2 = np.exp(2 * bhw)
         exp3 = np.exp(3 * bhw)
         exp4 = np.exp(4 * bhw)
         exp5 = np.exp(5 * bhw)
         exp6 = np.exp(6 * bhw)
-        exp7 = np.exp(7 * bhw)
-        exp8 = np.exp(8 * bhw)
-        num = bhw * (5 * exp6 + 31 * exp5 + 47 * exp4 + 50 * exp3 + 47 * exp2 + 31 * exp + 5)
+        num =  5 * exp6 + 31 * exp5 + 47 * exp4 + 50 * exp3 + 47 * exp2 + 31 * exp + 5
         denom = (exp - 1) * (exp + 1) * (exp2 + exp + 1) * (exp2 + 4 * exp + 1)
 
-        return (num / denom) * hbar * omega
+        return hbar * omega * num / denom
 
     # Unless specified otherwise, assume distinguishable particles.
-    return get_harmonic_energy(nparticles, bhw, dim, False) * hbar * omega
+    return get_harmonic_energy(3, bhw, dim, False) * hbar * omega
 
 """
 def main():

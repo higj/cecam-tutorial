@@ -103,11 +103,22 @@ def analytical_energy(nparticles=3, temp=17.8, sys_type='dist'):
     elif sys_type == 'mixed':
         return (get_harmonic_energy(2, bhw, dim, True) + get_harmonic_energy(1, bhw, dim, False)) * hbar * omega
     elif sys_type == 'fermionic':
-        return 0  # COMPLETE THE FERMIONIC ANALYTICAL ENERGY
+        # Analytical result for three fermions in a 3D harmonic trap (NVT)
+        exp = np.exp(bhw)
+        exp2 = np.exp(2 * bhw)
+        exp3 = np.exp(3 * bhw)
+        exp4 = np.exp(4 * bhw)
+        exp5 = np.exp(5 * bhw)
+        exp6 = np.exp(6 * bhw)
+        exp7 = np.exp(7 * bhw)
+        exp8 = np.exp(8 * bhw)
+        num = bhw * (5 * exp6 + 31 * exp5 + 47 * exp4 + 50 * exp3 + 47 * exp2 + 31 * exp + 5)
+        denom = (exp - 1) * (exp + 1) * (exp2 + exp + 1) * (exp2 + 4 * exp + 1)
+
+        return (num / denom) * hbar * omega
 
     # Unless specified otherwise, assume distinguishable particles.
     return get_harmonic_energy(nparticles, bhw, dim, False) * hbar * omega
-
 
 """
 def main():

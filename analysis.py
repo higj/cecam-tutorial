@@ -12,28 +12,48 @@ def getdZk(k, bhw, dim):
 
 
 # Mean energy of n non-interacting bosons (Alg. 4.7 from Krauth, p. 231)
-def get_harmonic_energy(n, bhw, dim, is_bosonic=True):
-    if not is_bosonic:
+def get_harmonic_energy(n, bhw, dim, ptcl_type='dist'):
+    if ptcl_type == 'dist':
         return -n * getdZk(1, bhw, dim) / getZk(1, bhw, dim)
 
-    z_arr = np.zeros(n + 1)
-    dz_arr = np.zeros(n + 1)
+    if ptcl_type == 'bosonic':
+        z_arr = np.zeros(n + 1)
+        dz_arr = np.zeros(n + 1)
 
-    z_arr[0] = 1.0
+        z_arr[0] = 1.0
 
-    for m in range(1, n + 1):
-        sig_z = 0.0
-        sig_dz = 0.0
+        for m in range(1, n + 1):
+            sig_z = 0.0
+            sig_dz = 0.0
 
-        for j in range(m, 0, -1):
-            sig_z += getZk(j, bhw, dim) * z_arr[m - j]
-            sig_dz += getdZk(j, bhw, dim) * z_arr[m - j] + getZk(j, bhw, dim) * dz_arr[m - j]
+            for j in range(m, 0, -1):
+                sig_z += getZk(j, bhw, dim) * z_arr[m - j]
+                sig_dz += getdZk(j, bhw, dim) * z_arr[m - j] + getZk(j, bhw, dim) * dz_arr[m - j]
 
-        z_arr[m] = sig_z / m
-        dz_arr[m] = sig_dz / m
+            z_arr[m] = sig_z / m
+            dz_arr[m] = sig_dz / m
+
+        return -dz_arr[n] / z_arr[n]
+
+    if ptcl_type == 'fermionic':
+        z_arr = np.zeros(n + 1)
+        dz_arr = np.zeros(n + 1)
+
+        z_arr[0] = 1.0
+
+        for m in range(1, n + 1):
+            sig_z = 0.0
+            sig_dz = 0.0
+
+            for j in range(m, 0, -1):
+                fermion_sign = (-1) ** (j - 1)
+                sig_z += getZk(j, bhw, dim) * z_arr[m - j] * fermion_sign
+                sig_dz += (getdZk(j, bhw, dim) * z_arr[m - j] + getZk(j, bhw, dim) * dz_arr[m - j]) * fermion_sign
+
+            z_arr[m] = sig_z / m
+            dz_arr[m] = sig_dz / m
 
     return -dz_arr[n] / z_arr[n]
-
 
 def read_ipi_output(filename):
     """ Reads an i-PI output file and returns a dictionary with the properties in a tidy order. """
@@ -93,21 +113,12 @@ def analytical_energy(temp=17.4, sys_type='dist'):
     bhw = hbar * beta * omega
 
     if sys_type == 'bosonic':
-        return get_harmonic_energy(3, bhw, dim, True) * hbar * omega
+        return get_harmonic_energy(3, bhw, dim, ptcl_type='bosonic') * hbar * omega
     elif sys_type == 'mixed':
-        return (get_harmonic_energy(2, bhw, dim, True) + get_harmonic_energy(1, bhw, dim, False)) * hbar * omega
+        return (get_harmonic_energy(2, bhw, dim, ptcl_type='bosonic') +
+                get_harmonic_energy(1, bhw, dim, ptcl_type='dist')) * hbar * omega
     elif sys_type == 'fermionic':
-        # Analytical result for three fermions in a 2D harmonic trap (NVT)
-        exp = np.exp(bhw)
-        exp2 = np.exp(2 * bhw)
-        exp3 = np.exp(3 * bhw)
-        exp4 = np.exp(4 * bhw)
-        exp5 = np.exp(5 * bhw)
-        exp6 = np.exp(6 * bhw)
-        num =  5 * exp6 + 31 * exp5 + 47 * exp4 + 50 * exp3 + 47 * exp2 + 31 * exp + 5
-        denom = (exp - 1) * (exp + 1) * (exp2 + exp + 1) * (exp2 + 4 * exp + 1)
-
-        return hbar * omega * num / denom
+        return get_harmonic_energy(3, bhw, dim, ptcl_type='fermionic') * hbar * omega
 
     # Unless specified otherwise, assume distinguishable particles.
-    return get_harmonic_energy(3, bhw, dim, False) * hbar * omega
+    return get_harmonic_energy(3, bhw, dim, ptcl_type='dist') * hbar * omega

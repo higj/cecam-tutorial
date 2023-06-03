@@ -7,7 +7,7 @@
             <address>localhost</address>
     </ffsocket>
 
-    <total_steps> 10000 </total_steps>
+    <total_steps> 5000 </total_steps>
 
     <output prefix="data">
       <trajectory stride="100" filename="pos" cell_units="angstrom">positions{angstrom}</trajectory>
@@ -26,14 +26,14 @@
           <force forcefield="driver"></force>
       </forces>
 
-      <initialize nbeads="32">
+      <initialize nbeads="12">
         <positions mode="manual" bead="0"> [-55, -81, -49, -83, -93, -38, 5, 22, -99] </positions>
         <masses mode="manual"> ['1.0', '1.0', '1.0'] </masses>
         <labels mode="manual"> ['E', 'E', 'E'] </labels>
         <cell>
          [   2500, 0, 0, 0, 2500, 0, 0, 0, 2500 ]
         </cell>
-        <velocities mode='thermal' units='kelvin'> 17.4 </velocities>
+        <velocities mode='thermal' units='kelvin'> 30.0 </velocities>
       </initialize>
 
       <normal_modes propagator='bab'>
@@ -42,7 +42,7 @@
       </normal_modes>
 
       <ensemble>
-         <temperature units="kelvin"> 17.4 </temperature>
+         <temperature units="kelvin"> 30.0 </temperature>
       </ensemble>
 
       <motion mode="dynamics">
